@@ -173,8 +173,18 @@ function renderView(){
     <div class="d">${clsAvg.filter(x=>x!=null).map((v,i)=>`${i+1}次:${v}`).join(' → ')}</div></div></div>`;
 
   // 折线图
+  const legendHTML = FOCUS.map(n=>`<span><i class="sw" style="background:${FOCUS_COLOR[n]}"></i>${n}</span>`).join('') + `<span><i class="sw" style="background:#94a3b8"></i>全班均分</span>`;
   html += `<div class="panel"><h2>重点学生${cur}走势 <span class="tag">实线=个人，灰色虚线=全班均分 · 缺记录处断开</span><div id="chart"></div>
-    <div class="legend">` + FOCUS.map(n=>`<span><i class="sw" style="background:${FOCUS_COLOR[n]}"></i>${n}</span>`).join('') + `<span><i class="sw" style="background:#94a3b8"></i>全班均分</span></div></div>`;
+    <div class="legend">${legendHTML}</div></div>`;
+  // 分类型走势图（仅综合视图）：听写 / 周末作业 各一张
+  if(cur==="综合"){
+    ["听写","周末作业"].forEach((t,ti)=>{
+      const idxs2=ASSIGN.map((a,i)=>({a,i})).filter(o=>o.a.type===t);
+      if(idxs2.length<2) return;
+      html += `<div class="panel"><h2>${t}走势图 <span class="tag">仅${t}类作业 · 实线=个人，灰色虚线=全班${t}均分 · 缺记录处断开</span><div id="chart-${ti}"></div>
+      <div class="legend">${legendHTML}</div></div>`;
+    });
+  }
 
   // 分类型均分总表（高分名单）
   const rows = Object.entries(DATA).map(([n,_])=>{
@@ -231,14 +241,20 @@ function renderView(){
     }).join('')+`</table></div></div>`;
 
   document.getElementById('view').innerHTML=html;
-  drawChart(idx,clsAvg);
+  drawChart('chart',idx,clsAvg,cur);
+  if(cur==="综合"){
+    ["听写","周末作业"].forEach((t,ti)=>{
+      const idxs2=ASSIGN.map((a,i)=>({a,i})).filter(o=>o.a.type===t);
+      if(idxs2.length>=2) drawChart('chart-'+ti, idxs2, classSeries(t), t);
+    });
+  }
 }
 
-function drawChart(idx,clsAvg){
+function drawChart(elId,idx,clsAvg,type){
   const labels=idx.map(o=>o.a.short);
   const W=1100,H=320,L=46,R=20,T=20,B=46;
-  if(labels.length===1){ // 单次作业：柱状对比
-    document.getElementById('chart').innerHTML=`<div class="note">该类型目前仅 1 次记录，累计 2 次以上自动切换为趋势折线图。</div>`;
+  if(labels.length===1){ // 单次作业：提示
+    document.getElementById(elId).innerHTML=`<div class="note">该类型目前仅 1 次记录，累计 2 次以上自动切换为趋势折线图。</div>`;
     return;
   }
   const xs=i=> L + i*(W-L-R)/(labels.length-1);
@@ -253,8 +269,8 @@ function drawChart(idx,clsAvg){
       arr.map((v,i)=>v==null?'':`<circle cx="${xs(i)}" cy="${ys(v)}" r="4" fill="#fff" stroke="${color}" stroke-width="2"/><text x="${xs(i)}" y="${ys(v)-9}" font-size="10" fill="${color}" text-anchor="middle">${v}</text>`).join('');
   };
   g+=line(clsAvg,'#94a3b8','5 4');
-  FOCUS.forEach(n=> g+=line(seriesOf(n,cur),FOCUS_COLOR[n]));
-  document.getElementById('chart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">${g}</svg>`;
+  FOCUS.forEach(n=> g+=line(seriesOf(n,type),FOCUS_COLOR[n]));
+  document.getElementById(elId).innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">${g}</svg>`;
 }
 
 renderTabs(); renderView();
