@@ -193,6 +193,22 @@ function renderView(){
       return `<tr class="${FOCUS.includes(r.n)?'focus-row':''}"><td class="num">${i+1}</td><td>${r.n}${FOCUS.includes(r.n)?' ⭐':''}</td><td class="num"><b>${r.av.toFixed(1)}</b></td><td class="num">${min}</td><td class="num">${trendIcon(r.s)}</td><td class="num">${fmt(r.dict)}</td><td class="num">${fmt(r.wknd)}</td><td class="num">${fmt(r.comp)}</td><td class="num">${spread}分 ${stab}</td><td>${badge(r.av)}</td></tr>`;
     }).join('')+`</table></div>`;
 
+  // 分类型走势表（仅综合视图）：听写 / 周末作业 分开看趋势
+  if(cur==="综合"){
+    ["听写","周末作业"].forEach(t=>{
+      const idxs=ASSIGN.map((a,i)=>({a,i})).filter(o=>o.a.type===t);
+      if(!idxs.length) return;
+      const series=Object.keys(DATA).map(n=>({n,s:seriesOf(n,t)})).sort((x,y)=>(avg(y.s)??-1)-(avg(x.s)??-1));
+      html += `<div class="panel"><h2>${t} · 分次走势表 <span class="tag">按${t}均分排序 · 共${idxs.length}次 · 灰=无记录/被模糊</span></h2>
+      <div class="scroll"><table><tr><th>学生</th>`+idxs.map((o,k)=>`<th class="num" style="font-size:11px">${t.slice(0,2)}${k+1}<br>${o.a.short}</th>`).join('')+`<th class="num">${t}均分</th><th>环比</th><th class="num">稳定性(极差)</th></tr>`+
+      series.map(r=>{
+        const av=avg(r.s), v=r.s.filter(x=>x!=null);
+        const spread=v.length?Math.max(...v)-Math.min(...v):null;
+        return `<tr class="${FOCUS.includes(r.n)?'focus-row':''}"><td>${r.n}${FOCUS.includes(r.n)?' ⭐':''}</td>`+r.s.map(x=>scoreCell(x)).join('')+`<td class="num"><b>${av==null?'—':av.toFixed(1)}</b></td><td class="num">${trendIcon(r.s)}</td><td class="num">${spread==null?'—':spread+'分'}</td></tr>`;
+      }).join('')+`</table></div></div>`;
+    });
+  }
+
   // 风险
   const risks=[];
   Object.entries(DATA).forEach(([n,a])=>{
