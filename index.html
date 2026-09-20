@@ -19,7 +19,7 @@
   .tab.active{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
   .tab .cnt{font-size:11px;opacity:.8;margin-left:4px}
   .tab.disabled{opacity:.45;cursor:not-allowed}
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
   .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
   .kpi .t{font-size:12px;color:var(--sub);margin-bottom:6px}
   .kpi .v{font-size:24px;font-weight:700}
@@ -57,7 +57,7 @@
 </head>
 <body>
 <h1>初一（5）班 · 英语作业成绩跟踪看板</h1>
-<div class="meta">数据来源：老师群发登记表截图（共 7 次，最新 第3周周末作业）· 更新时间 2026-09-20 · 作业类型：听写 / 默写 / 周末作业 / 作文 · 重点跟踪：周怡萱、黄思诚、聂耘锟 + 均分 90 以上学生</div>
+<div class="meta">数据来源：老师群发登记表截图（共 7 次，最新 第3周周末作业）· 更新时间 2026-09-20 · 作业类型：听写 / 默写 / 周末作业 / 作文 · 重点跟踪：周怡萱、聂耘锟、廖洪乐、王依麓 + 均分 90 以上学生</div>
 
 <div class="tabs" id="tabs"></div>
 <div id="view"></div>
@@ -88,8 +88,8 @@ const ASSIGN = [
 ];
 const TYPES = ["综合","听写","周末作业","默写","作文"];
 const TYPE_CLS = {"听写":"tt-dict","周末作业":"tt-weekend","默写":"tt-mo","待确认":"tt-tbd","作文":"tt-comp"};
-const FOCUS = ["周怡萱","黄思诚","聂耘锟"];
-const FOCUS_COLOR = {"周怡萱":"#dc2626","黄思诚":"#2563eb","聂耘锟":"#0d9488"};
+const FOCUS = ["周怡萱","聂耘锟","廖洪乐","王依麓"];
+const FOCUS_COLOR = {"周怡萱":"#dc2626","聂耘锟":"#0d9488","廖洪乐":"#2563eb","王依麓":"#c2410c"};
 
 const DATA = {
 "陈立任":[90,null,70,50,85,80,90],"陈丽蓉":[90,null,70,95,75,90,90],"陈睿奕":[88,80,80,70,null,85,90],
